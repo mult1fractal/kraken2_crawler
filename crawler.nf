@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 
 /*
-* Nextflow -- What the Phage
+* Nextflow -- kraken2
 * Author: MQT
 */
 
@@ -60,7 +60,7 @@ else { exit 1, "No engine selected:  -profile EXECUTER,ENGINE" }
 if (
     workflow.profile.contains('local') ||
     workflow.profile.contains('ukj_cloud') ||
-    workflow.profile.contains('stub') ||
+    workflow.profile.contains('stub')
     ) { "executer selected" }
 else { exit 1, "No executer selected:  -profile EXECUTER,ENGINE" }
 
@@ -70,14 +70,14 @@ else { exit 1, "No executer selected:  -profile EXECUTER,ENGINE" }
 *************/
 
 // fastq input or via csv file
-    if (params.fastq && params.list && !workflow.profile.contains('test_fastq')) { 
-        fastq_file_ch = Channel
+    if (params.fastq && params.list ) { 
+        fastq_input_ch = Channel
         .fromPath( params.fastq, checkIfExists: true )
         .splitCsv()
         .map { row -> ["${row[0]}", file("${row[1]}", checkIfExists: true)] }
     }
-    else if (params.fastq && !workflow.profile.contains('test_fastq')) { 
-        fastq_file_ch = Channel
+    else if (params.fastq ) { 
+        fastq_input_ch = Channel
         .fromPath( params.fastq, checkIfExists: true)
         .map { file -> tuple(file.simpleName, file) }
     }
@@ -91,23 +91,14 @@ include { classifier_wf } from './workflows/classifier_wf.nf'
 
 
 /************************** 
-* WtP Workflow
+* Workflow
 **************************/
 
 workflow {
 
-/************************** 
-* WtP setup
-**************************/
+    classifier_wf(fastq_input_ch)
 
-    if ( params.setup ) { setup_wf() }
-    else {
-    if (workflow.profile.contains('test') && !workflow.profile.contains('smalltest')) { fasta_input_ch = get_test_data_wf() }
-    if (workflow.profile.contains('smalltest') ) 
-        { fasta_input_ch = Channel.fromPath(workflow.projectDir + "/test-data/all_pos_phage.fa", checkIfExists: true).map { file -> tuple(file.simpleName, file) } }
-    }
 }
-
 /*************  
 * --help
 *************/
@@ -120,22 +111,18 @@ def helpMSG() {
     log.info """
     .
     ${c_yellow}Usage examples:${c_reset}
-    nextflow run replikation/What_the_Phage --fasta '*/*.fasta' --cores 20 --max_cores 40 \\
-        --output results -profile local,docker 
-
-    nextflow run phage.nf --fasta '*/*.fasta' --cores 20 \\
-        --output results -profile lsf,singularity \\
-        --cachedir /images/singularity_images \\
-        --databases /databases/WtP_databases/ 
-
-
+    nextflow run crawler.nf --fastq \\
+                            --cores 20 \\
+                            --max_cores 40 \\
+                            --output results \\
+                            -profile local,docker \\
+                            --databases 
 
     """.stripIndent()
 }
 
 if (!params.setup) {
     workflow.onComplete { 
-        log.info ( workflow.success ? "\nDone! Results are stored here --> $params.output \nThank you for using What the Phage\n \nPlease cite us: https://doi.org/10.1101/2020.07.24.219899 \
-                                      \n\nPlease also cite the other tools we use in our workflow --> $params.output/literature \n" : "Oops .. something went wrong" )
+        log.info ( workflow.success ? "\nDone! Results are stored here --> $params.output \n" : "Oops .. something went wrong" )
     }
 }

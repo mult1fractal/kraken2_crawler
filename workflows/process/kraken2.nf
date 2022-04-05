@@ -8,7 +8,7 @@ process kraken2 {
     	tuple val(name), path("${name}.kraken.out"), path("${name}.kreport"), emit: kraken2_kreport_ch
   	script:
     """
-    mkdir -p kraken_db && tar xzf ${database} -C kraken_db --strip-components 1
+    mkdir -p kraken_db && tar xfvz ${database} -C kraken_db --strip-components 1
 
     kraken2 --db kraken_db --threads ${task.cpus} --output ${name}.kraken.out --report ${name}.kreport masked_reads.fastq
 

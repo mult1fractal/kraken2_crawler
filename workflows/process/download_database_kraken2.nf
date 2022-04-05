@@ -4,16 +4,16 @@ process download_database_kraken2 {
         errorStrategy 'retry'
         maxRetries 1
     output:
-        path("kraken.tar.gz")
+        path("gtdb_r89_54k_centrifuge.tar")
     script:
 
         """
         echo ${task.attempt}
-        wget --no-check-certificate https://figshare.com/articles/dataset/GTDB_r89_54k/8956970?file=16378256 -O kraken.tar.gz
+        wget --no-check-certificate https://monash.figshare.com/ndownloader/files/16378439 -O gtdb_r89_54k_centrifuge.tar
         """
   
     stub:
         """
-        touch kraken.tar.gz
+        touch gtdb_r89_54k_centrifuge.tar
         """
 }
