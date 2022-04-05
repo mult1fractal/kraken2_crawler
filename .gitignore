@@ -1,0 +1,10 @@
+# nextflow related entries
+*.log*
+
+nextflow-autodownload-databases/
+work/
+.nextflow/
+# default out put dir
+results/
+kraken.tar.gz
+test_fastqs/
