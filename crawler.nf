@@ -81,13 +81,24 @@ else { exit 1, "No executer selected:  -profile EXECUTER,ENGINE" }
         .fromPath( params.fastq, checkIfExists: true)
         .map { file -> tuple(file.simpleName, file) }
     }
-
+// eachfile input 
+    if (params.each_file) { each_file_input_ch = Channel
+        .fromPath( params.each_file, checkIfExists: true)
+        // .splitCsv(header: true, sep: ',')
+        .splitCsv(header: true)
+        .map { row -> ( "${row.kmers}")}
+        .toList()
+        .view() //////////////////////////////////needs to be split to list
+    }
 
 /************************** 
 * Workflows to call
 **************************/
 
 include { classifier_wf } from './workflows/classifier_wf.nf'
+include { classifier_each_wf } from './workflows/classifier_wf.nf'
+
+
 
 
 /************************** 
@@ -95,8 +106,8 @@ include { classifier_wf } from './workflows/classifier_wf.nf'
 **************************/
 
 workflow {
-
-    classifier_wf(fastq_input_ch)
+    if (params.fastq && !params.each_file) { classifier_wf(fastq_input_ch) }
+    if (params.fastq && params.each_file) { classifier_each_wf(fastq_input_ch, each_file_input_ch ) }
 
 }
 /*************  
@@ -117,6 +128,7 @@ def helpMSG() {
                             --output results \\
                             -profile local,docker \\
                             --databases 
+                            --each_file
 
     """.stripIndent()
 }
