@@ -42,9 +42,10 @@ process kraken2_each {
       --minimum-hit-groups ${k_mode} \
       --output ${name}_${k_mode}.kraken.out \
       --report ${name}_${k_mode}.kreport \
+      ${reads}
+
       # --classified-out \
       # --unclassified-out \
-      ${reads}
 
     # reduce footprint
     rm -rf kraken_db/

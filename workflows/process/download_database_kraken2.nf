@@ -10,7 +10,6 @@ process download_database_kraken2 {
         """
         echo ${task.attempt}
         
-
         wget --no-check-certificate https://monash.figshare.com/ndownloader/files/16378262 -O gtdb_r89_54k_kraken2_04gb_taxok2d.tar
 
         """
