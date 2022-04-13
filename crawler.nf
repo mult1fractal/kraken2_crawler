@@ -130,11 +130,14 @@ def helpMSG() {
                             --databases 
                             --each_file
 
+    working each-command
+    nextflow run crawler.nf --fastq test_fastqs/115_stat_deep.fastq.gz --each_file test_fastqs/each_file.csv --cores 20 -profile local,docker -work-dir /media/6tb_1/work/
+
     """.stripIndent()
 }
 
-if (!params.setup) {
-    workflow.onComplete { 
+
+workflow.onComplete { 
         log.info ( workflow.success ? "\nDone! Results are stored here --> $params.output \n" : "Oops .. something went wrong" )
-    }
+    
 }

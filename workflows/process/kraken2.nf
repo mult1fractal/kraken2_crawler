@@ -30,13 +30,21 @@ process kraken2_each {
         path(database)
         each k_mode
   	output:
-    	  tuple val(name), path("${name}_*.kraken.out"), path("${name}_*.kreport"), emit: kraken2_kreport_ch
+    	  tuple val(name), path("${name}_*.kraken.out"), path("${name}_*.kreport"), emit: kraken2_each_kreport_ch
   	script:
     """
     mkdir -p kraken_db && tar xfv ${database} -C kraken_db
     ##--strip-components 1
 
-    kraken2 --db kraken_db --threads ${task.cpus} --minimum-hit-groups ${k_mode} --output ${name}_${k_mode}.kraken.out --report ${name}_${k_mode}.kreport ${reads}
+    kraken2 \
+      --db kraken_db \
+      --threads ${task.cpus} \
+      --minimum-hit-groups ${k_mode} \
+      --output ${name}_${k_mode}.kraken.out \
+      --report ${name}_${k_mode}.kreport \
+      # --classified-out \
+      # --unclassified-out \
+      ${reads}
 
     # reduce footprint
     rm -rf kraken_db/
