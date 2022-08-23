@@ -57,6 +57,26 @@ process kraken2_each {
   }
 
 /* 
+how to build database
+https://ccb.jhu.edu/software/kraken/MANUAL.html#custom-databases
+nanozoo/kraken2:2.1.1--d5ded30
+https://www.biorxiv.org/content/10.1101/2022.04.27.489753v1.full.pdf
+https://github.com/DerrickWood/kraken2/issues/167
+--confidence 0.05 or 0.1
+
+In the docker to build new database:
+install nano
+cd /conda/libexec/rsync_from_ncbi.pl
+in line 46 or so exchange ftp to:
+if (! ($full_path =~ s#^https://${qm_server}${qm_server_path}/##)) {
+
+
+kraken2-build --download-library archaea --db ncbi_kraken2_DB_19.08.22/
+kraken2-build --download-library bacteria --db ncbi_kraken2_DB_19.08.22/
+kraken2-build --download-library human --db ncbi_kraken2_DB_19.08.22/
+kraken2-build --download-library viral --db ncbi_kraken2_DB_19.08.22/
+fungi
+
   Hit group threshold: The option --minimum-hit-groups will allow you to require multiple hit 
   groups (a group of overlapping k-mers that share a common minimizer that is found in the hash table) be found before declaring a sequence classified, 
   which can be especially useful with custom databases when testing to see if sequences either do or do not belong to a particular genome.
